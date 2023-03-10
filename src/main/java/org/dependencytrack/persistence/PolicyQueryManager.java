@@ -41,6 +41,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Constructs a new QueryManager.
+     *
      * @param pm a PersistenceManager object
      */
     PolicyQueryManager(final PersistenceManager pm) {
@@ -49,7 +50,8 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Constructs a new QueryManager.
-     * @param pm a PersistenceManager object
+     *
+     * @param pm      a PersistenceManager object
      * @param request an AlpineRequest object
      */
     PolicyQueryManager(final PersistenceManager pm, final AlpineRequest request) {
@@ -58,6 +60,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns a List of all Policy objects.
+     *
      * @return a List of all Policy objects
      */
     public PaginatedResult getPolicies() {
@@ -76,6 +79,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
     /**
      * Returns a List of all Policy objects.
      * This method if designed NOT to provide paginated results.
+     *
      * @return a List of all Policy objects
      */
     public List<Policy> getAllPolicies() {
@@ -88,6 +92,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns a policy by it's name.
+     *
      * @param name the name of the policy (required)
      * @return a Policy object, or null if not found
      */
@@ -99,8 +104,9 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Creates a new Policy.
-     * @param name the name of the policy to create
-     * @param operator the operator
+     *
+     * @param name           the name of the policy to create
+     * @param operator       the operator
      * @param violationState the violation state
      * @return the created Policy
      */
@@ -114,6 +120,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Creates a policy condition for the specified Project.
+     *
      * @return the created PolicyCondition object
      */
     public PolicyCondition createPolicyCondition(final Policy policy, final PolicyCondition.Subject subject,
@@ -128,6 +135,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Updates a policy condition.
+     *
      * @return the updated PolicyCondition object
      */
     public PolicyCondition updatePolicyCondition(final PolicyCondition policyCondition) {
@@ -142,20 +150,20 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
      * Intelligently adds dependencies for components that are not already a dependency
      * of the specified project and removes the dependency relationship for components
      * that are not in the list of specified components.
-     * @param component the project to bind components to
+     *
+     * @param component        the project to bind components to
      * @param policyViolations the complete list of existing dependent components
      */
     public synchronized void reconcilePolicyViolations(final Component component, final List<PolicyViolation> policyViolations) {
         // Removes violations as dependencies to the project for all
         // components not included in the list provided
         List<PolicyViolation> markedForDeletion = new ArrayList<>();
-        for (final PolicyViolation existingViolation: getAllPolicyViolations(component)) {
+        for (final PolicyViolation existingViolation : getAllPolicyViolations(component)) {
             boolean keep = false;
-            for (final PolicyViolation violation: policyViolations) {
+            for (final PolicyViolation violation : policyViolations) {
                 if (violation.getType() == existingViolation.getType()
                         && violation.getPolicyCondition().getId() == existingViolation.getPolicyCondition().getId()
-                        && violation.getComponent().getId() == existingViolation.getComponent().getId())
-                {
+                        && violation.getComponent().getId() == existingViolation.getComponent().getId()) {
                     keep = true;
                     break;
                 }
@@ -171,6 +179,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Adds a policy violation
+     *
      * @param pv the policy violation to add
      */
     public synchronized PolicyViolation addPolicyViolationIfNotExist(final PolicyViolation pv) {
@@ -186,6 +195,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
     /**
      * Returns a List of all Policy objects.
      * This method if designed NOT to provide paginated results.
+     *
      * @return a List of all Policy objects
      */
     public List<PolicyViolation> getAllPolicyViolations() {
@@ -199,6 +209,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
     /**
      * Returns a List of all Policy objects.
      * This method if designed NOT to provide paginated results.
+     *
      * @return a List of all Policy objects
      */
     @SuppressWarnings("unchecked")
@@ -207,11 +218,12 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
         if (orderBy == null) {
             query.setOrdering("timestamp desc, project.name, project.version, component.name, component.version");
         }
-        return (List<PolicyViolation>)query.execute(policyCondition.getId());
+        return (List<PolicyViolation>) query.execute(policyCondition.getId());
     }
 
     /**
      * Returns a List of all {@link PolicyViolation}s for a specific component.
+     *
      * @param component The component to fetch {@link PolicyViolation}s for
      * @return a List of {@link PolicyViolation}s
      */
@@ -221,7 +233,8 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns a List of all {@link PolicyViolation}s for a specific component.
-     * @param component The component to fetch {@link PolicyViolation}s for
+     *
+     * @param component         The component to fetch {@link PolicyViolation}s for
      * @param includeSuppressed Whether to include suppressed violations or not
      * @return a List of {@link PolicyViolation}s
      */
@@ -250,6 +263,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
     /**
      * Returns a List of all Policy objects for a specific component.
      * This method if designed NOT to provide paginated results.
+     *
      * @return a List of all Policy objects
      */
     @SuppressWarnings("unchecked")
@@ -258,11 +272,12 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
         if (orderBy == null) {
             query.setOrdering("timestamp desc, component.name, component.version");
         }
-        return (List<PolicyViolation>)query.execute(project.getId());
+        return (List<PolicyViolation>) query.execute(project.getId());
     }
 
     /**
      * Returns a List of all Policy violations for a specific project.
+     *
      * @param project the project to retrieve violations for
      * @return a List of all Policy violations
      */
@@ -278,7 +293,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
             query.setOrdering("timestamp desc, component.name, component.version");
         }
         final PaginatedResult result = execute(query, project.getId());
-        for (final PolicyViolation violation: result.getList(PolicyViolation.class)) {
+        for (final PolicyViolation violation : result.getList(PolicyViolation.class)) {
             violation.getPolicyCondition().getPolicy(); // force policy to ne included since its not the default
             violation.getComponent().getResolvedLicense(); // force resolved license to ne included since its not the default
             violation.setAnalysis(getViolationAnalysis(violation.getComponent(), violation)); // Include the violation analysis by default
@@ -288,6 +303,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns a List of all Policy violations for a specific component.
+     *
      * @param component the component to retrieve violations for
      * @return a List of all Policy violations
      */
@@ -303,7 +319,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
             query.setOrdering("timestamp desc");
         }
         final PaginatedResult result = execute(query, component.getId());
-        for (final PolicyViolation violation: result.getList(PolicyViolation.class)) {
+        for (final PolicyViolation violation : result.getList(PolicyViolation.class)) {
             violation.getPolicyCondition().getPolicy(); // force policy to ne included since its not the default
             violation.getComponent().getResolvedLicense(); // force resolved license to ne included since its not the default
             violation.setAnalysis(getViolationAnalysis(violation.getComponent(), violation)); // Include the violation analysis by default
@@ -313,6 +329,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns a List of all Policy violations for the entire portfolio.
+     *
      * @return a List of all Policy violations
      */
     @SuppressWarnings("unchecked")
@@ -325,7 +342,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
             query.setOrdering("timestamp desc, project.name, project.version, component.name, component.version");
         }
         final PaginatedResult result = execute(query);
-        for (final PolicyViolation violation: result.getList(PolicyViolation.class)) {
+        for (final PolicyViolation violation : result.getList(PolicyViolation.class)) {
             violation.getPolicyCondition().getPolicy(); // force policy to ne included since its not the default
             violation.getComponent().getResolvedLicense(); // force resolved license to ne included since its not the default
             violation.setAnalysis(getViolationAnalysis(violation.getComponent(), violation)); // Include the violation analysis by default
@@ -335,7 +352,8 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns a ViolationAnalysis for the specified Component and PolicyViolation.
-     * @param component the Component
+     *
+     * @param component       the Component
      * @param policyViolation the PolicyViolation
      * @return a ViolationAnalysis object, or null if not found
      */
@@ -348,7 +366,8 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
     /**
      * Documents a new violation analysis. Creates a new ViolationAnalysis object if one doesn't already exists and appends
      * the specified comment along with a timestamp in the ViolationAnalysisComment trail.
-     * @param component the Component
+     *
+     * @param component       the Component
      * @param policyViolation the PolicyViolation
      * @return a ViolationAnalysis object
      */
@@ -373,9 +392,10 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Adds a new violation analysis comment to the specified violation analysis.
+     *
      * @param violationAnalysis the violation analysis object to add a comment to
-     * @param comment the comment to make
-     * @param commenter the name of the principal who wrote the comment
+     * @param comment           the comment to make
+     * @param commenter         the name of the principal who wrote the comment
      * @return a new ViolationAnalysisComment object
      */
     public ViolationAnalysisComment makeViolationAnalysisComment(ViolationAnalysis violationAnalysis, String comment, String commenter) {
@@ -392,6 +412,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Deleted all violation analysis and comments associated for the specified Component.
+     *
      * @param component the Component to delete violation analysis for
      */
     void deleteViolationAnalysisTrail(Component component) {
@@ -401,6 +422,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Deleted all violation analysis and comments associated for the specified Project.
+     *
      * @param project the Project to delete violation analysis for
      */
     void deleteViolationAnalysisTrail(Project project) {
@@ -410,6 +432,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Deleted all violation analysis and comments associated for the specified Policy Condition.
+     *
      * @param policyViolation policy violation to delete violation analysis for
      */
     private void deleteViolationAnalysisTrail(PolicyViolation policyViolation) {
@@ -419,6 +442,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns a List of all LicenseGroup objects.
+     *
      * @return a List of all LicenseGroup objects
      */
     public PaginatedResult getLicenseGroups() {
@@ -436,6 +460,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns a license group by it's name.
+     *
      * @param name the name of the license group (required)
      * @return a LicenseGroup object, or null if not found
      */
@@ -447,6 +472,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Creates a new LicenseGroup.
+     *
      * @param name the name of the license group to create
      * @return the created LicenseGroup
      */
@@ -458,7 +484,8 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Determines if the specified LicenseGroup contains the specified License.
-     * @param lg the LicenseGroup to query
+     *
+     * @param lg      the LicenseGroup to query
      * @param license the License to query for
      * @return true if License is part of LicenseGroup, false if not
      */
@@ -471,6 +498,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Deletes a {@link Policy}, including all related {@link PolicyViolation}s and {@link PolicyCondition}s.
+     *
      * @param policy the {@link Policy} to delete
      */
     public void deletePolicy(final Policy policy) {
@@ -482,6 +510,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Deleted all PolicyViolation associated for the specified Component.
+     *
      * @param component the Component to delete PolicyViolation for
      */
     void deletePolicyViolations(Component component) {
@@ -491,6 +520,7 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Deleted all PolicyViolation associated for the specified Project.
+     *
      * @param project the Project to delete PolicyViolation for
      */
     void deletePolicyViolations(Project project) {
@@ -500,11 +530,12 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Deleted all PolicyViolation associated for the specified PolicyCondition.
+     *
      * @param policyCondition the PolicyCondition to delete PolicyViolation for
      */
     public void deletePolicyCondition(PolicyCondition policyCondition) {
         final List<PolicyViolation> violations = getAllPolicyViolations(policyCondition);
-        for (PolicyViolation violation: violations) {
+        for (PolicyViolation violation : violations) {
             deleteViolationAnalysisTrail(violation);
         }
         delete(violations);
@@ -513,13 +544,14 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Removes all associations with a given {@link Project} from all {@link Policy}s.
+     *
      * @param project The {@link Project} to remove from policies
      */
     public void removeProjectFromPolicies(final Project project) {
         final Query<Policy> query = pm.newQuery(Policy.class, "projects.contains(:project)");
         query.setParameters(project);
 
-        for (final Policy policy: query.executeList()) {
+        for (final Policy policy : query.executeList()) {
             policy.getProjects().remove(project);
             persist(policy);
         }
@@ -527,8 +559,9 @@ final class PolicyQueryManager extends QueryManager implements IQueryManager {
 
     /**
      * Returns the number of audited policy violations of a given type for a component.
+     *
      * @param component The {@link Component} to retrieve audit counts for
-     * @param type The {@link PolicyViolation.Type} to retrieve audit counts for
+     * @param type      The {@link PolicyViolation.Type} to retrieve audit counts for
      * @return The total number of audited {@link PolicyViolation}s for the {@link Component}
      */
     public long getAuditedCount(final Component component, final PolicyViolation.Type type) {

@@ -7,6 +7,7 @@ import java.time.Duration;
 public enum ConfigKey implements Config.Key {
 
     SNYK_THREAD_POOL_SIZE("snyk.thread.pool.size", 10),
+    POLICY_EXECUTOR_THREAD_POOL_SIZE("policy.executor.thread.pool.size", 5),
     SNYK_RETRY_MAX_ATTEMPTS("snyk.retry.max.attempts", 10),
     SNYK_RETRY_EXPONENTIAL_BACKOFF_MULTIPLIER("snyk.retry.exponential.backoff.multiplier", 2),
     SNYK_RETRY_EXPONENTIAL_BACKOFF_INITIAL_DURATION_SECONDS("snyk.retry.exponential.backoff.initial.duration.seconds", 1),

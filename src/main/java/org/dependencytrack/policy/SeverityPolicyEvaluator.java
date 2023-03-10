@@ -52,18 +52,16 @@ public class SeverityPolicyEvaluator extends AbstractPolicyEvaluator {
     public List<PolicyConditionViolation> evaluate(final Policy policy, final Component component) {
         final List<PolicyConditionViolation> violations = new ArrayList<>();
         final List<PolicyCondition> policyConditions = super.extractSupportedConditions(policy);
-        //final Component component = qm.getObjectById(Component.class, c.getId());
-        for (final Vulnerability vulnerability : qm.getAllVulnerabilities(component, false)) {
-            for (final PolicyCondition condition: policyConditions) {
-                LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
+        final Component component1 = qm.getObjectById(Component.class, component.getId());
+        for (final Vulnerability vulnerability : qm.getAllVulnerabilities(component1, false)) {
+            for (final PolicyCondition condition : policyConditions) {
+                LOGGER.debug("Evaluating component (" + component1.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
                 if (PolicyCondition.Operator.IS == condition.getOperator()) {
                     if (vulnerability.getSeverity().name().equals(condition.getValue())) {
-                        violations.add(new PolicyConditionViolation(condition, component));
+                        violations.add(new PolicyConditionViolation(condition, component1));
                     }
-                } else if (PolicyCondition.Operator.IS_NOT == condition.getOperator()) {
-                    if (! vulnerability.getSeverity().name().equals(condition.getValue())) {
-                        violations.add(new PolicyConditionViolation(condition, component));
-                    }
+                } else if (PolicyCondition.Operator.IS_NOT == condition.getOperator() && !vulnerability.getSeverity().name().equals(condition.getValue())) {
+                    violations.add(new PolicyConditionViolation(condition, component1));
                 }
             }
         }

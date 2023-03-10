@@ -44,7 +44,13 @@ public abstract class AbstractPolicyEvaluator implements PolicyEvaluator {
         if (policy == null || policy.getPolicyConditions() == null) {
             return new ArrayList<>();
         } else {
-            return policy.getPolicyConditions().stream()
+            List<PolicyCondition> policyConditions = policy.getPolicyConditions();
+            List<PolicyCondition> enrichedPolicyConditions = new ArrayList<>();
+            for (PolicyCondition condition : policyConditions) {
+                condition.setPolicy(policy);
+                enrichedPolicyConditions.add(condition);
+            }
+            return enrichedPolicyConditions.stream()
                     .filter(p -> supportedSubject() == p.getSubject())
                     .collect(Collectors.toList());
         }
