@@ -53,7 +53,8 @@ public class CpePolicyEvaluator extends AbstractPolicyEvaluator {
         if (component.getCpe() == null) {
             return violations;
         }
-        for (final PolicyCondition condition: super.extractSupportedConditions(policy)) {
+        final Policy policy1 = qm.getPolicy(policy.getName());
+        for (final PolicyCondition condition: super.extractSupportedConditions(policy1)) {
             LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             if (PolicyCondition.Operator.MATCHES == condition.getOperator()) {
                 if (component.getCpe() != null && component.getCpe().contains(condition.getValue())) {

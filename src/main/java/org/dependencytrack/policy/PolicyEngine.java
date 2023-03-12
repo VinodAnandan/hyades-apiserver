@@ -58,16 +58,16 @@ public class PolicyEngine {
 
     public PolicyEngine() {
         evaluators.add(new SeverityPolicyEvaluator());
-        evaluators.add(new CoordinatesPolicyEvaluator());
-        evaluators.add(new LicenseGroupPolicyEvaluator());
-        evaluators.add(new LicensePolicyEvaluator());
-        evaluators.add(new PackageURLPolicyEvaluator());
-        evaluators.add(new CpePolicyEvaluator());
-        evaluators.add(new SwidTagIdPolicyEvaluator());
-        evaluators.add(new VersionPolicyEvaluator());
-        evaluators.add(new ComponentHashPolicyEvaluator());
-        evaluators.add(new CwePolicyEvaluator());
-        evaluators.add(new VulnerabilityIdPolicyEvaluator());
+//        evaluators.add(new CoordinatesPolicyEvaluator());
+//        evaluators.add(new LicenseGroupPolicyEvaluator());
+//        evaluators.add(new LicensePolicyEvaluator());
+//        evaluators.add(new PackageURLPolicyEvaluator());
+//        evaluators.add(new CpePolicyEvaluator());
+//        evaluators.add(new SwidTagIdPolicyEvaluator());
+//        evaluators.add(new VersionPolicyEvaluator());
+//        evaluators.add(new ComponentHashPolicyEvaluator());
+//        evaluators.add(new CwePolicyEvaluator());
+//        evaluators.add(new VulnerabilityIdPolicyEvaluator());
     }
 
     static {
@@ -97,16 +97,10 @@ public class PolicyEngine {
                     || isPolicyAssignedToProjectTag(policy, component.getProject())) {
                 LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy (" + policy.getUuid() + ")");
                 Component component1 = qm.getObjectById(Component.class, component.getId());
-                component1 = qm.detach(Component.class, component1.getId());
                 policy = qm.detach(Policy.class, policy.getId());
-                List<PolicyConditionViolation> policyConditionViolations = compute(policy, component1);
-                if (Policy.Operator.ANY == policy.getOperator()) {
-                    if (!policyConditionViolations.isEmpty()) {
-                        policyViolations.addAll(createPolicyViolations(qm, policyConditionViolations));
-                    }
-                } else if (Policy.Operator.ALL == policy.getOperator() && policyConditionViolations.size() == policy.getPolicyConditions().size()) {
-                    policyViolations.addAll(createPolicyViolations(qm, policyConditionViolations));
-                }
+                component1 = qm.detach(Component.class, component1.getId());
+                List<PolicyViolation> policyViolations1 = compute(policy, component1);
+                policyViolations.addAll(policyViolations1);
             }
         }
         qm.reconcilePolicyViolations(component, policyViolations);
@@ -117,16 +111,22 @@ public class PolicyEngine {
     }
 
 
-    private List<PolicyConditionViolation> compute(Policy policy, Component component) {
+    private List<PolicyViolation> compute(Policy policy, Component component) {
         final var countDownLatch = new CountDownLatch(evaluators.size());
-        List<PolicyConditionViolation> policyConditionViolations = new ArrayList<>();
+        List<PolicyViolation> policyViolations = new ArrayList<>();
         for (final PolicyEvaluator evaluator : evaluators) {
             CompletableFuture.runAsync(() ->
                     {
                         try (final QueryManager qm = new QueryManager()) {
                             evaluator.setQueryManager(qm);
-                            List<PolicyConditionViolation> policyConditionViolations1 = evaluator.evaluate(policy, component);
-                            policyConditionViolations.addAll(policyConditionViolations1);
+                            List<PolicyConditionViolation> policyConditionViolations = evaluator.evaluate(policy, component);
+                            if (Policy.Operator.ANY == policy.getOperator()) {
+                                if (!policyConditionViolations.isEmpty()) {
+                                    policyViolations.addAll(createPolicyViolations(qm, policyConditionViolations));
+                                }
+                            } else if (Policy.Operator.ALL == policy.getOperator() && policyConditionViolations.size() == policy.getPolicyConditions().size()) {
+                                policyViolations.addAll(createPolicyViolations(qm, policyConditionViolations));
+                            }
                         }
                     }, EXECUTOR)
                     .whenComplete((result, exception) -> {
@@ -137,13 +137,13 @@ public class PolicyEngine {
                     });
         }
         try {
-            if (!countDownLatch.await(1, TimeUnit.MINUTES)) {
-                LOGGER.warn("The policy evaluation for component :" + component.getName() + "took longer than 10 minutes");
+            if (!countDownLatch.await(10, TimeUnit.MINUTES)) {
+                LOGGER.warn("The policy evaluation for component :" + component.getName() + " took longer than 10 minutes");
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        return policyConditionViolations;
+        return policyViolations;
     }
 
     private boolean isPolicyAssignedToProject(Policy policy, Project project) {

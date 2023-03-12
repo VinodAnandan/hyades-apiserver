@@ -49,7 +49,7 @@ public class CwePolicyEvaluatorTest extends PersistenceCapableTest {
         qm.persist(vulnerability);
         qm.addVulnerability(vulnerability, component, AnalyzerIdentity.INTERNAL_ANALYZER);
         PolicyEvaluator evaluator = new CwePolicyEvaluator();
-        evaluator.setQueryManager(qm);
+       evaluator.setQueryManager(qm);
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(1, violations.size());
         PolicyConditionViolation violation = violations.get(0);
@@ -76,7 +76,7 @@ public class CwePolicyEvaluatorTest extends PersistenceCapableTest {
         qm.persist(vulnerability);
         qm.addVulnerability(vulnerability, component, AnalyzerIdentity.INTERNAL_ANALYZER);
         PolicyEvaluator evaluator = new CpePolicyEvaluator();
-        evaluator.setQueryManager(qm);
+       evaluator.setQueryManager(qm);
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(0, violations.size());
     }

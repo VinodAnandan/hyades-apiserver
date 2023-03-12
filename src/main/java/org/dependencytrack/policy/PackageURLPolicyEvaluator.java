@@ -20,6 +20,7 @@ package org.dependencytrack.policy;
 
 import alpine.common.logging.Logger;
 import org.dependencytrack.model.Component;
+import org.dependencytrack.model.License;
 import org.dependencytrack.model.Policy;
 import org.dependencytrack.model.PolicyCondition;
 
@@ -53,28 +54,30 @@ public class PackageURLPolicyEvaluator extends AbstractPolicyEvaluator {
         if (component.getPurl() == null) {
             return violations;
         }
-        for (final PolicyCondition condition: super.extractSupportedConditions(policy)) {
+        final Component component1 = qm.getObjectById(Component.class, component.getId());
+        final Policy policy1 = qm.getPolicy(policy.getName());
+        for (final PolicyCondition condition: super.extractSupportedConditions(policy1)) {
             LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             if (PolicyCondition.Operator.MATCHES == condition.getOperator()) {
-                if (component.getPurl() != null) {
-                    if (component.getPurl().canonicalize().contains(condition.getValue())) {
-                        violations.add(new PolicyConditionViolation(condition, component));
+                if (component1.getPurl() != null) {
+                    if (component1.getPurl().canonicalize().contains(condition.getValue())) {
+                        violations.add(new PolicyConditionViolation(condition, component1));
                     }
                 }
-                if (component.getPurlCoordinates() != null) {
-                    if (component.getPurlCoordinates().canonicalize().contains(condition.getValue())) {
-                        violations.add(new PolicyConditionViolation(condition, component));
+                if (component1.getPurlCoordinates() != null) {
+                    if (component1.getPurlCoordinates().canonicalize().contains(condition.getValue())) {
+                        violations.add(new PolicyConditionViolation(condition, component1));
                     }
                 }
             } else if (PolicyCondition.Operator.NO_MATCH == condition.getOperator()) {
-                if (component.getPurl() != null && component.getPurlCoordinates() != null) {
-                    if (!component.getPurl().canonicalize().contains(condition.getValue())
-                            && !component.getPurlCoordinates().canonicalize().contains(condition.getValue()) ) {
-                        violations.add(new PolicyConditionViolation(condition, component));
+                if (component1.getPurl() != null && component1.getPurlCoordinates() != null) {
+                    if (!component1.getPurl().canonicalize().contains(condition.getValue())
+                            && !component1.getPurlCoordinates().canonicalize().contains(condition.getValue()) ) {
+                        violations.add(new PolicyConditionViolation(condition, component1));
                     }
-                } else if (component.getPurl() != null) {
-                    if (!component.getPurl().canonicalize().contains(condition.getValue())) {
-                        violations.add(new PolicyConditionViolation(condition, component));
+                } else if (component1.getPurl() != null) {
+                    if (!component1.getPurl().canonicalize().contains(condition.getValue())) {
+                        violations.add(new PolicyConditionViolation(condition, component1));
                     }
                 }
             }

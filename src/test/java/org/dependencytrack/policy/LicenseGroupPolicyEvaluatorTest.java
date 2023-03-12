@@ -24,6 +24,7 @@ import org.dependencytrack.model.License;
 import org.dependencytrack.model.LicenseGroup;
 import org.dependencytrack.model.Policy;
 import org.dependencytrack.model.PolicyCondition;
+import org.dependencytrack.model.Project;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -87,9 +88,14 @@ public class LicenseGroupPolicyEvaluatorTest extends PersistenceCapableTest {
         PolicyCondition condition = qm.createPolicyCondition(policy, PolicyCondition.Subject.LICENSE_GROUP, PolicyCondition.Operator.IS_NOT, lg.getUuid().toString());
         policy = qm.detach(Policy.class, policy.getId());
         qm.detach(PolicyCondition.class, condition.getId());
+        Project project = new Project();
+        project.setName("My Project");
         Component component = new Component();
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
         component.setResolvedLicense(null);
-
+        qm.persist(component);
         PolicyEvaluator evaluator = new LicenseGroupPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(1, violations.size());
@@ -110,7 +116,6 @@ public class LicenseGroupPolicyEvaluatorTest extends PersistenceCapableTest {
         Policy policy = qm.createPolicy("Test Policy", Policy.Operator.ANY, Policy.ViolationState.INFO);
         qm.createPolicyCondition(policy, PolicyCondition.Subject.COORDINATES, PolicyCondition.Operator.IS, lg.getUuid().toString());
         Component component = new Component();
-        component.setResolvedLicense(license);
         PolicyEvaluator evaluator = new LicenseGroupPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(0, violations.size());

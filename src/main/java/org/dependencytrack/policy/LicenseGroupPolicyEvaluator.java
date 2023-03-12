@@ -52,27 +52,27 @@ public class LicenseGroupPolicyEvaluator extends AbstractPolicyEvaluator {
     @Override
     public List<PolicyConditionViolation> evaluate(final Policy policy, final Component component) {
         final List<PolicyConditionViolation> violations = new ArrayList<>();
-        final License license = component.getResolvedLicense();
-
-        for (final PolicyCondition condition : super.extractSupportedConditions(policy)) {
-            LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
+        final Component component1 = qm.getObjectById(Component.class, component.getId());
+        final License license = component1.getResolvedLicense();
+        final Policy policy1 = qm.getPolicy(policy.getName());
+        for (final PolicyCondition condition : super.extractSupportedConditions(policy1)) {
+            LOGGER.debug("Evaluating component (" + component1.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             final LicenseGroup lg = qm.getObjectByUuid(LicenseGroup.class, condition.getValue());
             if (license == null) {
                 if (PolicyCondition.Operator.IS_NOT == condition.getOperator()) {
-                    violations.add(new PolicyConditionViolation(condition, component));
+                    violations.add(new PolicyConditionViolation(condition, component1));
                 }
             } else {
                 final boolean containsLicense = qm.doesLicenseGroupContainLicense(lg, license);
                 if (PolicyCondition.Operator.IS == condition.getOperator()) {
                     if (containsLicense) {
-                        violations.add(new PolicyConditionViolation(condition, component));
+                        violations.add(new PolicyConditionViolation(condition, component1));
                     }
-                } else if (PolicyCondition.Operator.IS_NOT == condition.getOperator()) {
-                    if (!containsLicense) {
-                        violations.add(new PolicyConditionViolation(condition, component));
-                    }
+                } else if (PolicyCondition.Operator.IS_NOT == condition.getOperator() && !containsLicense) {
+                    violations.add(new PolicyConditionViolation(condition, component1));
                 }
             }
+
         }
         return violations;
     }

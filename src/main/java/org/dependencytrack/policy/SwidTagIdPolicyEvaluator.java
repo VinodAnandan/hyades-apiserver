@@ -20,6 +20,7 @@ package org.dependencytrack.policy;
 
 import alpine.common.logging.Logger;
 import org.dependencytrack.model.Component;
+import org.dependencytrack.model.License;
 import org.dependencytrack.model.Policy;
 import org.dependencytrack.model.PolicyCondition;
 
@@ -50,18 +51,20 @@ public class SwidTagIdPolicyEvaluator extends AbstractPolicyEvaluator {
     @Override
     public List<PolicyConditionViolation> evaluate(final Policy policy, final Component component) {
         final List<PolicyConditionViolation> violations = new ArrayList<>();
-        if (component.getSwidTagId() == null) {
+        final Component component1 = qm.getObjectById(Component.class, component.getId());
+        final Policy policy1 = qm.getPolicy(policy.getName());
+        if (component1.getSwidTagId() == null) {
             return violations;
         }
-        for (final PolicyCondition condition: super.extractSupportedConditions(policy)) {
-            LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
+        for (final PolicyCondition condition: super.extractSupportedConditions(policy1)) {
+            LOGGER.debug("Evaluating component (" + component1.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             if (PolicyCondition.Operator.MATCHES == condition.getOperator()) {
-                if (component.getSwidTagId() != null && component.getSwidTagId().contains(condition.getValue())) {
-                    violations.add(new PolicyConditionViolation(condition, component));
+                if (component1.getSwidTagId() != null && component1.getSwidTagId().contains(condition.getValue())) {
+                    violations.add(new PolicyConditionViolation(condition, component1));
                 }
             } else if (PolicyCondition.Operator.NO_MATCH == condition.getOperator()) {
-                if (component.getSwidTagId() != null && !component.getSwidTagId().contains(condition.getValue())) {
-                    violations.add(new PolicyConditionViolation(condition, component));
+                if (component1.getSwidTagId() != null && !component1.getSwidTagId().contains(condition.getValue())) {
+                    violations.add(new PolicyConditionViolation(condition, component1));
                 }
             }
         }
