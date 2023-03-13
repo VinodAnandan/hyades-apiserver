@@ -48,7 +48,7 @@ public class LicensePolicyEvaluatorTest extends PersistenceCapableTest {
         Assert.assertEquals(1, violations.size());
         PolicyConditionViolation violation = violations.get(0);
         Assert.assertEquals(component, violation.getComponent());
-        Assert.assertEquals(condition, violation.getPolicyCondition());
+        Assert.assertEquals(condition.getPolicy().getUuid(), violation.getPolicyCondition().getPolicy().getUuid());
     }
 
     @Test

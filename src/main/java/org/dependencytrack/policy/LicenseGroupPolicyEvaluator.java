@@ -54,8 +54,8 @@ public class LicenseGroupPolicyEvaluator extends AbstractPolicyEvaluator {
         final List<PolicyConditionViolation> violations = new ArrayList<>();
         final Component component1 = qm.getObjectById(Component.class, component.getId());
         final License license = component1.getResolvedLicense();
-        final Policy policy1 = qm.getPolicy(policy.getName());
-        for (final PolicyCondition condition : super.extractSupportedConditions(policy1)) {
+        final Policy policyFromDb = qm.getPolicy(policy.getName());
+        for (final PolicyCondition condition : super.extractSupportedConditions(policyFromDb)) {
             LOGGER.debug("Evaluating component (" + component1.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             final LicenseGroup lg = qm.getObjectByUuid(LicenseGroup.class, condition.getValue());
             if (license == null) {

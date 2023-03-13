@@ -57,8 +57,8 @@ public class CoordinatesPolicyEvaluator extends AbstractPolicyEvaluator {
     @Override
     public List<PolicyConditionViolation> evaluate(final Policy policy, final Component component) {
         final List<PolicyConditionViolation> violations = new ArrayList<>();
-        final Policy policy1 = qm.getPolicy(policy.getName());
-        for (final PolicyCondition condition : super.extractSupportedConditions(policy1)) {
+        final Policy policyFromDb = qm.getPolicy(policy.getName());
+        for (final PolicyCondition condition : super.extractSupportedConditions(policyFromDb)) {
             LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             final Coordinates coordinates = parseCoordinatesDefinition(condition);
             if (matches(condition.getOperator(), coordinates.getGroup(), component.getGroup())

@@ -55,8 +55,8 @@ public class PackageURLPolicyEvaluator extends AbstractPolicyEvaluator {
             return violations;
         }
         final Component component1 = qm.getObjectById(Component.class, component.getId());
-        final Policy policy1 = qm.getPolicy(policy.getName());
-        for (final PolicyCondition condition: super.extractSupportedConditions(policy1)) {
+        final Policy policyFromDb = qm.getPolicy(policy.getName());
+        for (final PolicyCondition condition: super.extractSupportedConditions(policyFromDb)) {
             LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             if (PolicyCondition.Operator.MATCHES == condition.getOperator()) {
                 if (component1.getPurl() != null) {

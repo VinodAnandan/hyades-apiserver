@@ -52,8 +52,8 @@ public class LicensePolicyEvaluator extends AbstractPolicyEvaluator {
     public List<PolicyConditionViolation> evaluate(final Policy policy, final Component component) {
         final List<PolicyConditionViolation> violations = new ArrayList<>();
         final License license = component.getResolvedLicense();
-
-        for (final PolicyCondition condition : super.extractSupportedConditions(policy)) {
+        final Policy policyFromDb = qm.getPolicy(policy.getName());
+        for (final PolicyCondition condition : super.extractSupportedConditions(policyFromDb)) {
             LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             if (condition.getValue().equals("unresolved")) {
                 if (license == null && PolicyCondition.Operator.IS == condition.getOperator()) {

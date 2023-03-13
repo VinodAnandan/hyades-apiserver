@@ -51,8 +51,9 @@
      @Override
      public List<PolicyConditionViolation> evaluate(final Policy policy, final Component component) {
          final List<PolicyConditionViolation> violations = new ArrayList<>();
-         final Policy policy1 = qm.getPolicy(policy.getName());
-         final List<PolicyCondition> policyConditions = super.extractSupportedConditions(policy1);
+         //final Policy policy1 = qm.getPolicy(policy.getName());
+         //final List<PolicyCondition> policyConditions = super.extractSupportedConditions(policy1);
+         final List<PolicyCondition> policyConditions = super.extractSupportedConditions(policy);
          final Component component1 = qm.getObjectById(Component.class, component.getId());
          for (final Vulnerability vulnerability : qm.getAllVulnerabilities(component1, false)) {
              for (final PolicyCondition condition : policyConditions) {

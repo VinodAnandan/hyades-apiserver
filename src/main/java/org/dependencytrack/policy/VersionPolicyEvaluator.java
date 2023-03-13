@@ -25,14 +25,14 @@ public class VersionPolicyEvaluator extends AbstractPolicyEvaluator {
 
     @Override
     public List<PolicyConditionViolation> evaluate(final Policy policy, final Component component) {
-        final Component component1 = qm.getObjectById(Component.class, component.getId());
-        final Policy policy1 = qm.getPolicy(policy.getName());
-        final var componentVersion = new ComponentVersion(component1.getVersion());
+//        final Component component1 = qm.getObjectById(Component.class, component.getId());
+        final Policy policyFromDb = qm.getPolicy(policy.getName());
+        final var componentVersion = new ComponentVersion(component.getVersion());
 
         final List<PolicyConditionViolation> violations = new ArrayList<>();
 
-        for (final PolicyCondition condition : super.extractSupportedConditions(policy1)) {
-            LOGGER.debug("Evaluating component (" + component1.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
+        for (final PolicyCondition condition : super.extractSupportedConditions(policyFromDb)) {
+            LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
 
             final var conditionVersion = new ComponentVersion(condition.getValue());
             if (conditionVersion.getVersionParts().isEmpty()) {
@@ -41,7 +41,7 @@ public class VersionPolicyEvaluator extends AbstractPolicyEvaluator {
             }
 
             if (matches(componentVersion, conditionVersion, condition.getOperator())) {
-                violations.add(new PolicyConditionViolation(condition, component1));
+                violations.add(new PolicyConditionViolation(condition, component));
             }
         }
 

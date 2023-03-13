@@ -21,7 +21,9 @@ package org.dependencytrack.policy;
 import alpine.common.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.cyclonedx.model.Hash;
-import org.dependencytrack.model.*;
+import org.dependencytrack.model.Component;
+import org.dependencytrack.model.Policy;
+import org.dependencytrack.model.PolicyCondition;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -48,8 +50,8 @@ public class ComponentHashPolicyEvaluator extends AbstractPolicyEvaluator {
     @Override
     public List<PolicyConditionViolation> evaluate(final Policy policy, final Component component) {
         final List<PolicyConditionViolation> violations = new ArrayList<>();
-        final Policy policy1 = qm.getPolicy(policy.getName());
-        for (final PolicyCondition condition : super.extractSupportedConditions(policy1)) {
+        final Policy policyFromDb = qm.getPolicy(policy.getName());
+        for (final PolicyCondition condition : super.extractSupportedConditions(policyFromDb)) {
             LOGGER.debug("Evaluating component (" + component.getUuid() + ") against policy condition (" + condition.getUuid() + ")");
             final Hash hash = extractHashValues(condition);
             if (matches(hash, component)) {
