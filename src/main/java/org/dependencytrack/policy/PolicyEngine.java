@@ -58,16 +58,16 @@ public class PolicyEngine {
 
     public PolicyEngine() {
         evaluators.add(new SeverityPolicyEvaluator());
-//        evaluators.add(new CoordinatesPolicyEvaluator());
-//        evaluators.add(new LicenseGroupPolicyEvaluator());
-//        evaluators.add(new LicensePolicyEvaluator());
-//        evaluators.add(new PackageURLPolicyEvaluator());
-//        evaluators.add(new CpePolicyEvaluator());
-//        evaluators.add(new SwidTagIdPolicyEvaluator());
-//        evaluators.add(new VersionPolicyEvaluator());
-//        evaluators.add(new ComponentHashPolicyEvaluator());
-//        evaluators.add(new CwePolicyEvaluator());
-//        evaluators.add(new VulnerabilityIdPolicyEvaluator());
+        evaluators.add(new CoordinatesPolicyEvaluator());
+        evaluators.add(new LicenseGroupPolicyEvaluator());
+        evaluators.add(new LicensePolicyEvaluator());
+        evaluators.add(new PackageURLPolicyEvaluator());
+        evaluators.add(new CpePolicyEvaluator());
+        evaluators.add(new SwidTagIdPolicyEvaluator());
+        evaluators.add(new VersionPolicyEvaluator());
+        evaluators.add(new ComponentHashPolicyEvaluator());
+        evaluators.add(new CwePolicyEvaluator());
+        evaluators.add(new VulnerabilityIdPolicyEvaluator());
     }
 
     static {

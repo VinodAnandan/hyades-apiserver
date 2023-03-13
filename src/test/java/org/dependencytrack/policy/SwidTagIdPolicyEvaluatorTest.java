@@ -22,6 +22,7 @@ import org.dependencytrack.PersistenceCapableTest;
 import org.dependencytrack.model.Component;
 import org.dependencytrack.model.Policy;
 import org.dependencytrack.model.PolicyCondition;
+import org.dependencytrack.model.Project;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,12 +36,18 @@ public class SwidTagIdPolicyEvaluatorTest extends PersistenceCapableTest {
         PolicyCondition condition = qm.createPolicyCondition(policy, PolicyCondition.Subject.SWID_TAGID, PolicyCondition.Operator.MATCHES, "0123456789");
         Component component = new Component();
         component.setSwidTagId("0123456789");
+        Project project = new Project();
+        project.setName("My Project");
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
+        qm.persist(component);
         PolicyEvaluator evaluator = new SwidTagIdPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(1, violations.size());
         PolicyConditionViolation violation = violations.get(0);
-        Assert.assertEquals(component, violation.getComponent());
-        Assert.assertEquals(condition, violation.getPolicyCondition());
+        Assert.assertEquals(component.getUuid(), violation.getComponent().getUuid());
+        Assert.assertEquals(condition.getPolicy().getUuid(), violation.getPolicyCondition().getPolicy().getUuid());
     }
 
     @Test
@@ -49,6 +56,12 @@ public class SwidTagIdPolicyEvaluatorTest extends PersistenceCapableTest {
         qm.createPolicyCondition(policy, PolicyCondition.Subject.SWID_TAGID, PolicyCondition.Operator.MATCHES, "0123456789");
         Component component = new Component();
         component.setSwidTagId("0000000000");
+        Project project = new Project();
+        project.setName("My Project");
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
+        qm.persist(component);
         PolicyEvaluator evaluator = new SwidTagIdPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(0, violations.size());
@@ -60,6 +73,12 @@ public class SwidTagIdPolicyEvaluatorTest extends PersistenceCapableTest {
         qm.createPolicyCondition(policy, PolicyCondition.Subject.COORDINATES, PolicyCondition.Operator.MATCHES, "0123456789");
         Component component = new Component();
         component.setSwidTagId("0123456789");
+        Project project = new Project();
+        project.setName("My Project");
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
+        qm.persist(component);
         PolicyEvaluator evaluator = new SwidTagIdPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(0, violations.size());
@@ -71,6 +90,12 @@ public class SwidTagIdPolicyEvaluatorTest extends PersistenceCapableTest {
         qm.createPolicyCondition(policy, PolicyCondition.Subject.SWID_TAGID, PolicyCondition.Operator.IS, "0123456789");
         Component component = new Component();
         component.setSwidTagId("0123456789");
+        Project project = new Project();
+        project.setName("My Project");
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
+        qm.persist(component);
         PolicyEvaluator evaluator = new SwidTagIdPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(0, violations.size());

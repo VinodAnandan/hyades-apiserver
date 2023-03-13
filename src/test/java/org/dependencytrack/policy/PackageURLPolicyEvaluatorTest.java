@@ -23,6 +23,7 @@ import org.dependencytrack.PersistenceCapableTest;
 import org.dependencytrack.model.Component;
 import org.dependencytrack.model.Policy;
 import org.dependencytrack.model.PolicyCondition;
+import org.dependencytrack.model.Project;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,12 +37,18 @@ public class PackageURLPolicyEvaluatorTest extends PersistenceCapableTest {
         PolicyCondition condition = qm.createPolicyCondition(policy, PolicyCondition.Subject.PACKAGE_URL, PolicyCondition.Operator.MATCHES, "pkg:generic/acme/example-component@1.0");
         Component component = new Component();
         component.setPurl(new PackageURL("pkg:generic/acme/example-component@1.0"));
+        Project project = new Project();
+        project.setName("My Project");
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
+        qm.persist(component);
         PolicyEvaluator evaluator = new PackageURLPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(1, violations.size());
         PolicyConditionViolation violation = violations.get(0);
-        Assert.assertEquals(component, violation.getComponent());
-        Assert.assertEquals(condition, violation.getPolicyCondition());
+        Assert.assertEquals(component.getUuid(), violation.getComponent().getUuid());
+        Assert.assertEquals(condition.getPolicy().getUuid(), violation.getPolicyCondition().getPolicy().getUuid());
     }
 
     @Test
@@ -50,6 +57,12 @@ public class PackageURLPolicyEvaluatorTest extends PersistenceCapableTest {
         qm.createPolicyCondition(policy, PolicyCondition.Subject.PACKAGE_URL, PolicyCondition.Operator.MATCHES, "pkg:generic/acme/example-component@1.0");
         Component component = new Component();
         component.setPurl(new PackageURL("pkg:generic/acme/web-component@6.9"));
+        Project project = new Project();
+        project.setName("My Project");
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
+        qm.persist(component);
         PolicyEvaluator evaluator = new PackageURLPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(0, violations.size());
@@ -61,6 +74,12 @@ public class PackageURLPolicyEvaluatorTest extends PersistenceCapableTest {
         qm.createPolicyCondition(policy, PolicyCondition.Subject.COORDINATES, PolicyCondition.Operator.MATCHES, "pkg:generic/acme/example-component@1.0");
         Component component = new Component();
         component.setPurl(new PackageURL("pkg:generic/acme/example-component@1.0"));
+        Project project = new Project();
+        project.setName("My Project");
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
+        qm.persist(component);
         PolicyEvaluator evaluator = new PackageURLPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
         Assert.assertEquals(0, violations.size());
@@ -71,6 +90,12 @@ public class PackageURLPolicyEvaluatorTest extends PersistenceCapableTest {
         Policy policy = qm.createPolicy("Test Policy", Policy.Operator.ANY, Policy.ViolationState.INFO);
         qm.createPolicyCondition(policy, PolicyCondition.Subject.PACKAGE_URL, PolicyCondition.Operator.IS, "pkg:generic/acme/example-component@1.0");
         Component component = new Component();
+        Project project = new Project();
+        project.setName("My Project");
+        component.setName("Test Component");
+        component.setVersion("1.0");
+        component.setProject(project);
+        qm.persist(component);
         component.setPurl(new PackageURL("pkg:generic/acme/example-component@1.0"));
         PolicyEvaluator evaluator = new PackageURLPolicyEvaluator();
         List<PolicyConditionViolation> violations = evaluator.evaluate(policy, component);
